@@ -1,0 +1,50 @@
+import os
+from mcp.server.fastmcp import FastMCP
+from kiteconnect import KiteConnect
+
+mcp = FastMCP(
+    "Zerodha",
+    stateless_http=True,
+    json_response=True
+)
+
+
+def get_kite():
+    return KiteConnect(
+        api_key=os.environ["KITE_API_KEY"],
+        access_token=os.environ["KITE_ACCESS_TOKEN"]
+    )
+
+
+@mcp.tool()
+def get_ltp(instrument: str) -> dict:
+    """Get latest price. Example: NSE:INFY"""
+    return get_kite().ltp(instrument)
+
+
+@mcp.tool()
+def get_positions() -> dict:
+    """Get current Zerodha positions."""
+    return get_kite().positions()
+
+
+@mcp.tool()
+def get_holdings() -> list:
+    """Get Zerodha holdings."""
+    return get_kite().holdings()
+
+
+@mcp.tool()
+def get_orders() -> list:
+    """Get today's Zerodha orders."""
+    return get_kite().orders()
+
+
+@mcp.tool()
+def get_margins() -> dict:
+    """Get Zerodha margins."""
+    return get_kite().margins()
+
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http")
